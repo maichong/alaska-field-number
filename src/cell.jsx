@@ -8,7 +8,7 @@ import React from 'react';
 import getMuiTheme from 'material-ui/lib/styles/getMuiTheme';
 import ContextPure from 'material-ui/lib/mixins/context-pure';
 
-export default class NumberFieldView extends React.Component {
+export default class NumberFieldCell extends React.Component {
 
   static propTypes = {
     children: React.PropTypes.node
@@ -70,7 +70,7 @@ export default class NumberFieldView extends React.Component {
       root: {}
     };
     return (
-      <div style={styles.root}>NumberFieldView Component</div>
+      <div style={styles.root}>NumberFieldCell Component</div>
     );
   }
 }
