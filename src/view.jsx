@@ -7,6 +7,8 @@
 import React from 'react';
 import getMuiTheme from 'material-ui/lib/styles/getMuiTheme';
 import ContextPure from 'material-ui/lib/mixins/context-pure';
+import TextField from 'material-ui/lib/text-field';
+const numeral = require('numeral');
 
 export default class NumberFieldView extends React.Component {
 
@@ -30,6 +32,7 @@ export default class NumberFieldView extends React.Component {
 
   constructor(props, context) {
     super(props);
+    this._handleChange = this._handleChange.bind(this);
     this.state = {
       muiTheme: context.muiTheme ? context.muiTheme : getMuiTheme(),
       views: context.views
@@ -43,12 +46,6 @@ export default class NumberFieldView extends React.Component {
     };
   }
 
-  componentWillMount() {
-  }
-
-  componentDidMount() {
-  }
-
   componentWillReceiveProps(nextProps, nextContext) {
     let newState = {};
     if (nextContext.muiTheme) {
@@ -60,17 +57,38 @@ export default class NumberFieldView extends React.Component {
     this.setState(newState);
   }
 
-  componentWillUnmount() {
+  _handleChange(event) {
+    let field = this.props.field;
+    let value = event.target.value;
+    if (field.format) {
+      value = numeral().unformat(value);
+    }
+    if (this.props.onChange) {
+      this.props.onChange(value);
+    }
   }
 
   render() {
-    let props = this.props;
-    let state = this.state;
-    let styles = {
-      root: {}
-    };
+    let {
+      model,
+      data,
+      field,
+      value,
+      onChange,
+      ...others
+      } = this.props;
+    if (field.format) {
+      value = numeral(value).format(field.format);
+    }
     return (
-      <div style={styles.root}>NumberFieldView Component</div>
+      <div><TextField
+        ref="input"
+        value={value}
+        fullWidth={field.fullWidth}
+        hintText={field.label}
+        onChange={this._handleChange}
+        {...others}
+      /></div>
     );
   }
 }

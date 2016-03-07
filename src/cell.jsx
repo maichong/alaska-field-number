@@ -7,6 +7,7 @@
 import React from 'react';
 import getMuiTheme from 'material-ui/lib/styles/getMuiTheme';
 import ContextPure from 'material-ui/lib/mixins/context-pure';
+const numeral = require('numeral');
 
 export default class NumberFieldCell extends React.Component {
 
@@ -69,8 +70,12 @@ export default class NumberFieldCell extends React.Component {
     let styles = {
       root: {}
     };
+    let value = props.value;
+    if (props.field.format) {
+      value = numeral(value).format(props.field.format);
+    }
     return (
-      <div style={styles.root}>NumberFieldCell Component</div>
+      <div style={styles.root}>{value}</div>
     );
   }
 }
