@@ -77,18 +77,27 @@ export default class NumberFieldView extends React.Component {
       onChange,
       ...others
       } = this.props;
+
     if (field.format) {
       value = numeral(value).format(field.format);
     }
+
+    let { muiTheme } = this.state;
+    let noteElement = field.note ?
+      <div style={field.fullWidth?muiTheme.fieldNote:muiTheme.fieldNoteInline}>{field.note}</div> : null;
     return (
-      <div><TextField
-        ref="input"
-        value={value}
-        fullWidth={field.fullWidth}
-        hintText={field.label}
-        onChange={this._handleChange}
-        {...others}
-      /></div>
+      <div>
+        <TextField
+          ref="input"
+          value={value}
+          fullWidth={field.fullWidth}
+          floatingLabelText={field.label}
+          onChange={this._handleChange}
+          disabled={field.noedit}
+          {...others}
+        />
+        {noteElement}
+      </div>
     );
   }
 }
