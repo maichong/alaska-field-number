@@ -32,11 +32,17 @@ export default class NumberFieldView extends React.Component {
 
   constructor(props, context) {
     super(props);
-    this._handleChange = this._handleChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleFocus = this.handleFocus.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
     this.state = {
       muiTheme: context.muiTheme ? context.muiTheme : getMuiTheme(),
-      views: context.views
+      views: context.views,
+      value: props.value
     };
+    if (props.field.format) {
+      this.state.value = numeral(props.value).format(props.field.format);
+    }
   }
 
   getChildContext() {
@@ -54,17 +60,42 @@ export default class NumberFieldView extends React.Component {
     if (nextContext.views) {
       newState.views = nextContext.views;
     }
+    if (nextProps.value) {
+      newState.value = nextProps.value;
+      if (this.props.field.format) {
+        newState.value = numeral(nextProps.value).format(this.props.field.format);
+      }
+    }
     this.setState(newState);
   }
 
-  _handleChange(event) {
+  handleChange(event) {
     let field = this.props.field;
     let value = event.target.value;
-    if (field.format) {
+    if (!/^\d*\.?\d*$/.test(value) && field.format) {
       value = numeral().unformat(value);
+    }
+    if (isNaN(value)) {
+      value = parseFloat(event.target.value) || '';
     }
     if (this.props.onChange) {
       this.props.onChange(value);
+    }
+  }
+
+  handleFocus() {
+    this.focused = true;
+  }
+
+  handleBlur() {
+    this.focused = false;
+    let field = this.props.field;
+    if (field.format) {
+      let value = numeral(this.props.value).format(field.format);
+      this.setState({ value });
+      if (value != this.props.value && value == parseFloat(value)) {
+        this.props.onChange && this.props.onChange(parseFloat(value));
+      }
     }
   }
 
@@ -75,11 +106,12 @@ export default class NumberFieldView extends React.Component {
       field,
       value,
       onChange,
+      disabled,
       ...others
       } = this.props;
 
-    if (field.format) {
-      value = numeral(value).format(field.format);
+    if (!this.focused) {
+      value = this.state.value;
     }
 
     let { muiTheme } = this.state;
@@ -92,8 +124,10 @@ export default class NumberFieldView extends React.Component {
           value={value}
           fullWidth={field.fullWidth}
           floatingLabelText={field.label}
-          onChange={this._handleChange}
-          disabled={field.noedit}
+          onChange={this.handleChange}
+          disabled={disabled}
+          onFocus={this.handleFocus}
+          onBlur={this.handleBlur}
           {...others}
         />
         {noteElement}
