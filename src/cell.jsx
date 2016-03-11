@@ -61,12 +61,12 @@ export default class NumberFieldCell extends React.Component {
     this.setState(newState);
   }
 
-  componentWillUnmount() {
+  shouldComponentUpdate(props) {
+    return props.value != this.props.value;
   }
 
   render() {
     let props = this.props;
-    let state = this.state;
     let styles = {
       root: {}
     };

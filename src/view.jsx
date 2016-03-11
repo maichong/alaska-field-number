@@ -9,6 +9,7 @@ import getMuiTheme from 'material-ui/lib/styles/getMuiTheme';
 import ContextPure from 'material-ui/lib/mixins/context-pure';
 import TextField from 'material-ui/lib/text-field';
 const numeral = require('numeral');
+import { shallowEqual } from 'alaska-admin-view';
 
 export default class NumberFieldView extends React.Component {
 
@@ -38,10 +39,11 @@ export default class NumberFieldView extends React.Component {
     this.state = {
       muiTheme: context.muiTheme ? context.muiTheme : getMuiTheme(),
       views: context.views,
-      value: props.value
+      value: props.value,
+      display: props.display,
     };
     if (props.field.format) {
-      this.state.value = numeral(props.value).format(props.field.format);
+      this.state.value = this.state.display = numeral(props.value).format(props.field.format);
     }
   }
 
@@ -65,21 +67,32 @@ export default class NumberFieldView extends React.Component {
       if (this.props.field.format) {
         newState.value = numeral(nextProps.value).format(this.props.field.format);
       }
+      if (this.focused) {
+        //正在输入
+        newState.display = nextProps.value;
+      } else {
+        //不在输入状态
+        newState.display = newState.value;
+      }
     }
     this.setState(newState);
   }
 
+  shouldComponentUpdate(props, state) {
+    return !shallowEqual(props, this.props, 'data', 'onChange', 'model') || !shallowEqual(state, this.state);
+  }
+
   handleChange(event) {
     let field = this.props.field;
-    let value = event.target.value;
-    if (!/^\d*\.?\d*$/.test(value) && field.format) {
-      value = numeral().unformat(value);
+    let display = event.target.value;
+    if (field.format && !/^\d*\.?\d*$/.test(display)) {
+      display = numeral().unformat(display);
     }
-    if (isNaN(value)) {
-      value = parseFloat(event.target.value) || '';
+    if (isNaN(display)) {
+      display = parseFloat(event.target.display) || '';
     }
     if (this.props.onChange) {
-      this.props.onChange(value);
+      this.props.onChange(display);
     }
   }
 
@@ -92,9 +105,10 @@ export default class NumberFieldView extends React.Component {
     let field = this.props.field;
     if (field.format) {
       let value = numeral(this.props.value).format(field.format);
-      this.setState({ value });
-      if (value != this.props.value && value == parseFloat(value)) {
-        this.props.onChange && this.props.onChange(parseFloat(value));
+      this.setState({ value, display: value });
+      let unfomarted = numeral().unformat(value);
+      if (unfomarted != this.props.value) {
+        this.props.onChange && this.props.onChange(unfomarted);
       }
     }
   }
@@ -110,18 +124,14 @@ export default class NumberFieldView extends React.Component {
       ...others
       } = this.props;
 
-    if (!this.focused) {
-      value = this.state.value;
-    }
-
-    let { muiTheme } = this.state;
+    let { muiTheme, display } = this.state;
     let noteElement = field.note ?
       <div style={field.fullWidth?muiTheme.fieldNote:muiTheme.fieldNoteInline}>{field.note}</div> : null;
     return (
       <div>
         <TextField
           ref="input"
-          value={value}
+          value={display}
           fullWidth={field.fullWidth}
           floatingLabelText={field.label}
           onChange={this.handleChange}
