@@ -7,6 +7,7 @@
 'use strict';
 
 const alaska = require('alaska');
+const numeral = require('numeral');
 
 exports.views = {
   cell: {
@@ -21,6 +22,30 @@ exports.views = {
 
 exports.plain = Number;
 
+/**
+ * 初始化Schema
+ * @param field   alaksa.Model中的字段配置
+ * @param schema
+ * @param Model
+ */
+exports.initSchema = function (field, schema, Model) {
+  let options = {
+    type: Number,
+    min: field.min,
+    max: field.max
+  };
+  if (field.default !== undefined) {
+    options.default = field.default;
+  }
+  schema.path(field.path, options);
+
+  Model.underscoreMethod(field.path, 'format', function (format) {
+    if (format) {
+      return numeral(this.get(field.path)).format(format);
+    }
+    return this.get(field.path);
+  });
+};
 
 /**
  * alaska-admin-view 前端控件初始化参数
@@ -29,6 +54,8 @@ exports.plain = Number;
  */
 exports.viewOptions = function (field, Model) {
   let options = alaska.Field.viewOptions.apply(this, arguments);
+  options.min = field.min instanceof Array ? field.min[0] : field.min;
+  options.max = field.max instanceof Array ? field.max[0] : field.max;
   options.format = field.format;
   if (!options.format && options.format !== false) {
     options.format = '0,0';

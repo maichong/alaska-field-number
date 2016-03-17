@@ -91,6 +91,12 @@ export default class NumberFieldView extends React.Component {
     if (isNaN(display)) {
       display = parseFloat(event.target.display) || '';
     }
+    if (field.max !== undefined && display > field.max) {
+      display = field.max;
+    }
+    if (field.min !== undefined && display < field.min) {
+      display = field.min;
+    }
     if (this.props.onChange) {
       this.props.onChange(display);
     }
