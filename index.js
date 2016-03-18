@@ -30,13 +30,23 @@ exports.plain = Number;
  */
 exports.initSchema = function (field, schema, Model) {
   let options = {
-    type: Number,
-    min: field.min,
-    max: field.max
+    type: Number
   };
-  if (field.default !== undefined) {
-    options.default = field.default;
-  }
+  [
+    'get',
+    'set',
+    'default',
+    'index',
+    'required',
+    'select',
+    'min',
+    'max'
+  ].forEach(function (key) {
+    if (field[key] !== undefined) {
+      options[key] = field[key];
+    }
+  });
+
   schema.path(field.path, options);
 
   Model.underscoreMethod(field.path, 'format', function (format) {
