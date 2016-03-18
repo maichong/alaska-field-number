@@ -66,9 +66,6 @@ exports.viewOptions = function (field, Model) {
   let options = alaska.Field.viewOptions.apply(this, arguments);
   options.min = field.min instanceof Array ? field.min[0] : field.min;
   options.max = field.max instanceof Array ? field.max[0] : field.max;
-  options.format = field.format;
-  if (!options.format && options.format !== false) {
-    options.format = '0,0';
-  }
+  options.format = field.format || '';
   return options;
 };

@@ -40,7 +40,7 @@ export default class NumberFieldView extends React.Component {
       muiTheme: context.muiTheme ? context.muiTheme : getMuiTheme(),
       views: context.views,
       value: props.value,
-      display: props.display,
+      display: props.value,
     };
     if (props.field.format) {
       this.state.value = this.state.display = numeral(props.value).format(props.field.format);
@@ -87,9 +87,9 @@ export default class NumberFieldView extends React.Component {
     let display = event.target.value;
     if (field.format && !/^\d*\.?\d*$/.test(display)) {
       display = numeral().unformat(display);
-    }
-    if (isNaN(display)) {
-      display = parseFloat(event.target.display) || '';
+      if (isNaN(display)) {
+        display = parseFloat(event.target.display) || '';
+      }
     }
     if (field.max !== undefined && display > field.max) {
       display = field.max;
@@ -121,13 +121,8 @@ export default class NumberFieldView extends React.Component {
 
   render() {
     let {
-      model,
-      data,
       field,
-      value,
-      onChange,
-      disabled,
-      ...others
+      disabled
       } = this.props;
 
     let { muiTheme, display } = this.state;
@@ -144,7 +139,6 @@ export default class NumberFieldView extends React.Component {
           disabled={disabled}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
-          {...others}
         />
         {noteElement}
       </div>
