@@ -109,13 +109,16 @@ export default class NumberFieldView extends React.Component {
   handleBlur() {
     this.focused = false;
     let field = this.props.field;
+    let unfomarted;
     if (field.format) {
       let value = numeral(this.props.value).format(field.format);
       this.setState({ value, display: value });
-      let unfomarted = numeral().unformat(value);
-      if (unfomarted != this.props.value) {
-        this.props.onChange && this.props.onChange(unfomarted);
-      }
+      unfomarted = numeral().unformat(value);
+    } else {
+      unfomarted = parseFloat(this.props.value) || '';
+    }
+    if (unfomarted !== this.props.value) {
+      this.props.onChange && this.props.onChange(unfomarted);
     }
   }
 

@@ -9,7 +9,67 @@
 const alaska = require('alaska');
 const numeral = require('numeral');
 
-exports.views = {
+class NumberField extends alaska.Field {
+  init() {
+    let field = this;
+    this.underscoreMethod('format', function (format) {
+      if (format) {
+        return numeral(this.get(field.path)).format(format);
+      }
+      return this.get(field.path);
+    });
+  }
+
+  createFilter(filter) {
+    let value;
+    if (typeof filter === 'object') {
+      value = filter.value;
+    } else if (typeof filter === 'number' || typeof filter === 'string') {
+      value = filter;
+    }
+    if (value !== undefined) {
+      value = parseFloat(value);
+      return isNaN(value) ? undefined : value;
+    }
+
+    //区间
+    let bt;
+    if (filter instanceof Array) {
+      bt = filter;
+    } else if (filter.$bt && filter.$bt instanceof Array) {
+      bt = filter.$bt;
+    }
+    if (bt && bt.length === 2) {
+      let start = parseFloat(bt[0]);
+      let end = parseFloat(bt[1]);
+      if (isNaN(start) || isNaN(end)) {
+        return;
+      }
+      return { $gte: start, $lte: end };
+    }
+
+    //比较
+    ['$gt', '$gte', '$lt', '$lte'].forEach((key) => {
+      let val = filter[key];
+      if (val === undefined) {
+        return;
+      }
+      val = parseFloat(val);
+      if (isNaN(val)) {
+        return;
+      }
+      if (!value) {
+        value = {};
+      }
+      value[key] = val;
+    });
+    if (value) {
+      return value;
+    }
+  }
+}
+
+NumberField.views = {
   cell: {
     name: 'NumberFieldCell',
     field: __dirname + '/lib/cell.js'
@@ -20,52 +80,8 @@ exports.views = {
   }
 };
 
-exports.plain = Number;
+NumberField.plain = Number;
+NumberField.options = ['min', 'max'];
+NumberField.viewOptions = ['min', 'max', 'format'];
 
-/**
- * 初始化Schema
- * @param field   alaksa.Model中的字段配置
- * @param schema
- * @param Model
- */
-exports.initSchema = function (field, schema, Model) {
-  let options = {
-    type: Number
-  };
-  [
-    'get',
-    'set',
-    'default',
-    'index',
-    'required',
-    'select',
-    'min',
-    'max'
-  ].forEach(function (key) {
-    if (field[key] !== undefined) {
-      options[key] = field[key];
-    }
-  });
-
-  schema.path(field.path, options);
-
-  Model.underscoreMethod(field.path, 'format', function (format) {
-    if (format) {
-      return numeral(this.get(field.path)).format(format);
-    }
-    return this.get(field.path);
-  });
-};
-
-/**
- * alaska-admin-view 前端控件初始化参数
- * @param field
- * @param Model
- */
-exports.viewOptions = function (field, Model) {
-  let options = alaska.Field.viewOptions.apply(this, arguments);
-  options.min = field.min instanceof Array ? field.min[0] : field.min;
-  options.max = field.max instanceof Array ? field.max[0] : field.max;
-  options.format = field.format || '';
-  return options;
-};
+module.exports = NumberField;
