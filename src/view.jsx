@@ -5,11 +5,9 @@
  */
 
 import React from 'react';
-import getMuiTheme from 'material-ui/lib/styles/getMuiTheme';
-import ContextPure from 'material-ui/lib/mixins/context-pure';
-import TextField from 'material-ui/lib/text-field';
 const numeral = require('numeral');
 import { shallowEqual } from 'alaska-admin-view';
+import { Input } from 'react-bootstrap';
 
 export default class NumberFieldView extends React.Component {
 
@@ -17,51 +15,18 @@ export default class NumberFieldView extends React.Component {
     children: React.PropTypes.node
   };
 
-  static contextTypes = {
-    muiTheme: React.PropTypes.object,
-    views: React.PropTypes.object,
-  };
-
-  static childContextTypes = {
-    muiTheme: React.PropTypes.object,
-    views: React.PropTypes.object,
-  };
-
-  static mixins = [
-    ContextPure
-  ];
-
-  constructor(props, context) {
+  constructor(props) {
     super(props);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleFocus = this.handleFocus.bind(this);
-    this.handleBlur = this.handleBlur.bind(this);
     this.state = {
-      muiTheme: context.muiTheme ? context.muiTheme : getMuiTheme(),
-      views: context.views,
-      value: props.value,
-      display: props.value,
+      display: props.value
     };
     if (props.field.format) {
-      this.state.value = this.state.display = numeral(props.value).format(props.field.format);
+      this.state.display = numeral(props.value).format(props.field.format);
     }
   }
 
-  getChildContext() {
-    return {
-      muiTheme: this.state.muiTheme,
-      views: this.context.views,
-    };
-  }
-
-  componentWillReceiveProps(nextProps, nextContext) {
+  componentWillReceiveProps(nextProps) {
     let newState = {};
-    if (nextContext.muiTheme) {
-      newState.muiTheme = nextContext.muiTheme;
-    }
-    if (nextContext.views) {
-      newState.views = nextContext.views;
-    }
     if (nextProps.value) {
       newState.value = nextProps.value;
       if (this.props.field.format) {
@@ -82,69 +47,59 @@ export default class NumberFieldView extends React.Component {
     return !shallowEqual(props, this.props, 'data', 'onChange', 'model') || !shallowEqual(state, this.state);
   }
 
-  handleChange(event) {
-    let field = this.props.field;
+  handleChange = (event) => {
     let display = event.target.value;
-    if (field.format && !/^\d*\.?\d*$/.test(display)) {
-      display = numeral().unformat(display);
-      if (isNaN(display)) {
-        display = parseFloat(event.target.display) || '';
-      }
-    }
-    if (field.max !== undefined && display > field.max) {
-      display = field.max;
-    }
-    if (field.min !== undefined && display < field.min) {
-      display = field.min;
-    }
-    if (this.props.onChange) {
-      this.props.onChange(display);
-    }
-  }
+    this.setState({ display });
+  };
 
-  handleFocus() {
+  handleFocus = () => {
     this.focused = true;
-  }
+  };
 
-  handleBlur() {
+  handleBlur = () => {
     this.focused = false;
     let field = this.props.field;
+    let value = this.state.display;
     let unfomarted;
     if (field.format) {
-      let value = numeral(this.props.value).format(field.format);
-      this.setState({ value, display: value });
       unfomarted = numeral().unformat(value);
+      if (isNaN(unfomarted)) {
+        unfomarted = 0;
+      }
+      this.setState({ display: numeral(unfomarted).format(field.format) });
     } else {
-      unfomarted = parseFloat(this.props.value) || '';
+      unfomarted = parseFloat(value) || '';
+      if (unfomarted != value) {
+        this.setState({ display: unfomarted });
+      }
     }
     if (unfomarted !== this.props.value) {
       this.props.onChange && this.props.onChange(unfomarted);
     }
-  }
+  };
 
   render() {
     let {
       field,
-      disabled
+      disabled,
+      errorText
       } = this.props;
 
-    let { muiTheme, display } = this.state;
-    let noteElement = field.note ?
-      <div style={field.fullWidth?muiTheme.fieldNote:muiTheme.fieldNoteInline}>{field.note}</div> : null;
+    let { display } = this.state;
+    let help = errorText ? <span className="text-danger">{errorText}</span> : field.note ? field.note : null;
     return (
-      <div>
-        <TextField
-          ref="input"
-          value={display}
-          fullWidth={field.fullWidth}
-          floatingLabelText={field.label}
-          onChange={this.handleChange}
-          disabled={disabled}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-        />
-        {noteElement}
-      </div>
+      <Input
+        type="text"
+        value={display}
+        label={field.label}
+        onChange={this.handleChange}
+        disabled={disabled}
+        onFocus={this.handleFocus}
+        onBlur={this.handleBlur}
+        labelClassName="col-xs-2"
+        wrapperClassName="col-xs-10"
+        help={help}
+      />
     );
   }
 }
