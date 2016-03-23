@@ -85,11 +85,17 @@ export default class NumberFieldView extends React.Component {
       errorText
       } = this.props;
 
+    let help = field.help;
+    let style;
+    if (errorText) {
+      style = 'error';
+      help = errorText;
+    }
     let { display } = this.state;
-    let help = errorText ? <span className="text-danger">{errorText}</span> : field.note ? field.note : null;
     return (
       <Input
         type="text"
+        bsStyle={style}
         value={display}
         label={field.label}
         onChange={this.handleChange}
@@ -99,6 +105,8 @@ export default class NumberFieldView extends React.Component {
         labelClassName="col-xs-2"
         wrapperClassName="col-xs-10"
         help={help}
+        addonAfter={field.addonAfter}
+        addonBefore={field.addonBefore}
       />
     );
   }

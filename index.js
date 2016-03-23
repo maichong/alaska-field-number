@@ -82,6 +82,6 @@ NumberField.views = {
 
 NumberField.plain = Number;
 NumberField.options = ['min', 'max'];
-NumberField.viewOptions = ['min', 'max', 'format'];
+NumberField.viewOptions = ['min', 'max', 'format', 'addonBefore', 'addonAfter'];
 
 module.exports = NumberField;
