@@ -7,12 +7,17 @@
 import React from 'react';
 const numeral = require('numeral');
 import { shallowEqual } from 'alaska-admin-view';
-import { Input } from 'react-bootstrap';
 
 export default class NumberFieldView extends React.Component {
 
   static propTypes = {
-    children: React.PropTypes.node
+    value: React.PropTypes.any,
+    model: React.PropTypes.object,
+    data: React.PropTypes.object,
+    field: React.PropTypes.object,
+    disabled: React.PropTypes.bool,
+    errorText: React.PropTypes.string,
+    onChange: React.PropTypes.func,
   };
 
   constructor(props) {
@@ -82,32 +87,59 @@ export default class NumberFieldView extends React.Component {
     let {
       field,
       disabled,
+      value,
       errorText
       } = this.props;
-
     let help = field.help;
-    let style;
+    let className = 'form-group';
     if (errorText) {
-      style = 'error';
+      className += ' has-error';
       help = errorText;
     }
-    let { display } = this.state;
-    return (
-      <Input
+    let helpElement = help ? <p className="help-block">{help}</p> : null;
+    let inputElement;
+    if (field.static) {
+      inputElement = <p className="form-control-static">{value}</p>;
+    } else {
+      inputElement = (<input
         type="text"
-        bsStyle={style}
-        value={display}
-        label={field.label}
+        className="form-control"
         onChange={this.handleChange}
-        disabled={disabled}
         onFocus={this.handleFocus}
         onBlur={this.handleBlur}
-        labelClassName="col-xs-2"
-        wrapperClassName="col-xs-10"
-        help={help}
-        addonAfter={field.addonAfter}
-        addonBefore={field.addonBefore}
-      />
+        value={this.state.display}
+        disabled={disabled}
+      />);
+      let addonAfter = field.addonAfter ? <span className="input-group-addon">{field.addonAfter}</span> : null;
+      let addonBefore = field.addonBefore ? <span className="input-group-addon">{field.addonBefore}</span> : null;
+      if (addonAfter || addonBefore) {
+        inputElement = <div className="input-group">{addonBefore}{inputElement}{addonAfter}</div>;
+      }
+    }
+
+    let label = field.nolabel ? '' : field.label;
+
+    if (field.fullWidth) {
+      let labelElement = label ? (
+        <label className="control-label">{label}</label>
+      ) : null;
+      return (
+        <div className={className}>
+          {labelElement}
+          {inputElement}
+          {helpElement}
+        </div>
+      );
+    }
+
+    return (
+      <div className={className}>
+        <label className="col-sm-2 control-label">{label}</label>
+        <div className="col-sm-10">
+          {inputElement}
+          {helpElement}
+        </div>
+      </div>
     );
   }
 }
