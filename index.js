@@ -38,30 +38,26 @@ class NumberField extends alaska.Field {
       bt = filter;
     } else if (filter.$bt && filter.$bt instanceof Array) {
       bt = filter.$bt;
+    } else if (filter.bt && filter.bt instanceof Array) {
+      bt = filter.bt;
     }
     if (bt && bt.length === 2) {
       let start = parseFloat(bt[0]);
       let end = parseFloat(bt[1]);
-      if (isNaN(start) || isNaN(end)) {
-        return;
-      }
+      if (isNaN(start) || isNaN(end)) return;
       return { $gte: start, $lte: end };
     }
 
     //比较
-    ['$gt', '$gte', '$lt', '$lte'].forEach((key) => {
-      let val = filter[key];
-      if (val === undefined) {
-        return;
-      }
+    ['gt', 'gte', 'lt', 'lte'].forEach((key) => {
+      let val = filter[key] || filter['$' + key];
+      if (val === undefined) return;
       val = parseFloat(val);
-      if (isNaN(val)) {
-        return;
-      }
+      if (isNaN(val)) return;
       if (!value) {
         value = {};
       }
-      value[key] = val;
+      value['$' + key] = val;
     });
     if (value) {
       return value;
@@ -77,6 +73,10 @@ NumberField.views = {
   view: {
     name: 'NumberFieldView',
     field: __dirname + '/lib/view.js'
+  },
+  filter: {
+    name: 'NumberFieldFilter',
+    field: __dirname + '/lib/filter.js'
   }
 };
 

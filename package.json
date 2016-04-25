@@ -1,6 +1,6 @@
 {
   "name": "alaska-field-number",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Alaska number field",
   "main": "index.js",
   "scripts": {
