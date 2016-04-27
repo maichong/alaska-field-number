@@ -20,6 +20,10 @@ export default class NumberFieldView extends React.Component {
     onChange: React.PropTypes.func,
   };
 
+  static contextTypes = {
+    t: React.PropTypes.func,
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -88,8 +92,10 @@ export default class NumberFieldView extends React.Component {
       field,
       disabled,
       value,
-      errorText
+      errorText,
+      model
       } = this.props;
+    const t = this.context.t;
     let help = field.help;
     let className = 'form-group';
     if (errorText) {
@@ -110,8 +116,10 @@ export default class NumberFieldView extends React.Component {
         value={this.state.display}
         disabled={disabled}
       />);
-      let addonAfter = field.addonAfter ? <span className="input-group-addon">{field.addonAfter}</span> : null;
-      let addonBefore = field.addonBefore ? <span className="input-group-addon">{field.addonBefore}</span> : null;
+      let addonAfter = field.addonAfter ?
+        <span className="input-group-addon">{t(field.addonAfter, model.service.id)}</span> : null;
+      let addonBefore = field.addonBefore ?
+        <span className="input-group-addon">{t(field.addonBefore, model.service.id)}</span> : null;
       if (addonAfter || addonBefore) {
         inputElement = <div className="input-group">{addonBefore}{inputElement}{addonAfter}</div>;
       }
