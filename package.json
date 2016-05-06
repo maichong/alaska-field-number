@@ -1,7 +1,11 @@
 {
   "name": "alaska-field-number",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Alaska number field",
+  "keywords": [
+    "alaska",
+    "alaska-field"
+  ],
   "main": "index.js",
   "scripts": {
     "build": "babel ./src --out-dir ./lib",

@@ -117,9 +117,9 @@ export default class NumberFieldView extends React.Component {
         disabled={disabled}
       />);
       let addonAfter = field.addonAfter ?
-        <span className="input-group-addon">{t(field.addonAfter, model.service.id)}</span> : null;
+        <span className="input-group-addon">{t(field.addonAfter, field.service || model.service.id)}</span> : null;
       let addonBefore = field.addonBefore ?
-        <span className="input-group-addon">{t(field.addonBefore, model.service.id)}</span> : null;
+        <span className="input-group-addon">{t(field.addonBefore, field.service || model.service.id)}</span> : null;
       if (addonAfter || addonBefore) {
         inputElement = <div className="input-group">{addonBefore}{inputElement}{addonAfter}</div>;
       }
