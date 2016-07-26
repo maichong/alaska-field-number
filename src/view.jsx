@@ -36,7 +36,7 @@ export default class NumberFieldView extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     let newState = {};
-    if (nextProps.value) {
+    if (typeof nextProps.value !== 'undefined' || typeof nextProps.field.default === 'undefined') {
       newState.value = nextProps.value;
       if (this.props.field.format) {
         newState.value = numeral(nextProps.value).format(this.props.field.format);

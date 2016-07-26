@@ -68,15 +68,15 @@ class NumberField extends alaska.Field {
 NumberField.views = {
   cell: {
     name: 'NumberFieldCell',
-    field: __dirname + '/lib/cell.js'
+    path: __dirname + '/lib/cell.js'
   },
   view: {
     name: 'NumberFieldView',
-    field: __dirname + '/lib/view.js'
+    path: __dirname + '/lib/view.js'
   },
   filter: {
     name: 'NumberFieldFilter',
-    field: __dirname + '/lib/filter.js'
+    path: __dirname + '/lib/filter.js'
   }
 };
 
