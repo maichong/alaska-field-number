@@ -107,6 +107,7 @@ export default class NumberFieldView extends React.Component {
     if (field.static) {
       inputElement = <p className="form-control-static">{value}</p>;
     } else {
+      let placeholder = field.placeholder ? t(field.placeholder, field.service || model.service.id) : '';
       inputElement = (<input
         type="text"
         className="form-control"
@@ -115,6 +116,7 @@ export default class NumberFieldView extends React.Component {
         onBlur={this.handleBlur}
         value={this.state.display}
         disabled={disabled}
+        placeholder={placeholder}
       />);
       let addonAfter = field.addonAfter ?
         <span className="input-group-addon">{t(field.addonAfter, field.service || model.service.id)}</span> : null;
