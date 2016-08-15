@@ -8,20 +8,22 @@ import React from 'react';
 const numeral = require('numeral');
 import { shallowEqual } from 'alaska-admin-view';
 
+const { bool, object, any, func, string } = React.PropTypes;
+
 export default class NumberFieldView extends React.Component {
 
   static propTypes = {
-    value: React.PropTypes.any,
-    model: React.PropTypes.object,
-    data: React.PropTypes.object,
-    field: React.PropTypes.object,
-    disabled: React.PropTypes.bool,
-    errorText: React.PropTypes.string,
-    onChange: React.PropTypes.func,
+    value: any,
+    model: object,
+    data: object,
+    field: object,
+    disabled: bool,
+    errorText: string,
+    onChange: func,
   };
 
   static contextTypes = {
-    t: React.PropTypes.func,
+    t: func,
   };
 
   constructor(props) {
@@ -97,7 +99,7 @@ export default class NumberFieldView extends React.Component {
       } = this.props;
     const t = this.context.t;
     let help = field.help;
-    let className = 'form-group';
+    let className = 'form-group number-field';
     if (errorText) {
       className += ' has-error';
       help = errorText;

@@ -6,16 +6,18 @@
 
 import React from 'react';
 
+const { object, func } = React.PropTypes;
+
 export default class NumberFieldFilter extends React.Component {
 
   static propTypes = {
-    field: React.PropTypes.object,
-    onChange: React.PropTypes.func,
-    onClose: React.PropTypes.func,
+    field: object,
+    onChange: func,
+    onClose: func,
   };
 
   static contextTypes = {
-    t: React.PropTypes.func,
+    t: func,
   };
 
   constructor(props) {
@@ -42,11 +44,19 @@ export default class NumberFieldFilter extends React.Component {
       mode = 3;
       value1 = value.lte;
     }
+
+    let error = false;
+    if (!value1 && value1 !== 0) {
+      error = true;
+    }
+    if (mode === 4 && ((!value2 && value2 !== 0) || value1 >= value2)) {
+      error = true;
+    }
     this.state = {
       mode, // 1 等于 2大于 3小于 4区间
       value1,
       value2,
-      error: false
+      error
     };
     this.handleMode1 = this.handleMode.bind(this, 1);
     this.handleMode2 = this.handleMode.bind(this, 2);
@@ -97,7 +107,7 @@ export default class NumberFieldFilter extends React.Component {
     const { field, onClose } = this.props;
     const { mode, value1, value2, error } = this.state;
     const buttonClassName = 'btn btn-default';
-    const buttonClassNameActive = buttonClassName + ' active';
+    const buttonClassNameActive = buttonClassName + ' btn-success';
     let input2 = null;
     if (mode === 4) {
       input2 = <input
@@ -108,11 +118,11 @@ export default class NumberFieldFilter extends React.Component {
         value={value2}
       />;
     }
-    let className = 'row field-filter field-filter-number' + (error ? ' error' : '');
+    let className = 'row field-filter number-field-filter' + (error ? ' error' : '');
     return (
       <div className={className}>
         <label className="col-xs-2 control-label text-right">{field.label}</label>
-        <form className="form-inline col-xs-10">
+        <div className="form-inline col-xs-10">
           <div className="form-group btn-group">
             <a
               className={mode === 1 ? buttonClassNameActive : buttonClassName}
@@ -139,7 +149,7 @@ export default class NumberFieldFilter extends React.Component {
             value={value1}
           />
           {input2}
-        </form>
+        </div>
         <a className="btn field-filter-close" onClick={onClose}><i className="fa fa-close"/></a>
       </div>
     );
