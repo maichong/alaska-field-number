@@ -34,26 +34,34 @@ export default class NumberFieldFilter extends React.Component {
       if (value.lte) {
         //区间
         value2 = value.lte;
-        mode = 4;
+        mode = 6;
       } else {
-        //大于
-        mode = 2;
+        //大于等于
+        mode = 4;
       }
     } else if (value.lte) {
-      //小于
-      mode = 3;
+      //小于等于
+      mode = 5;
       value1 = value.lte;
+    } else if (value.gt) {
+      //大于
+      mode = 2;
+      value1 = value.gt;
+    } else if (value.lt) {
+      //大于
+      mode = 3;
+      value1 = value.lt;
     }
 
     let error = false;
     if (!value1 && value1 !== 0) {
       error = true;
     }
-    if (mode === 4 && ((!value2 && value2 !== 0) || value1 >= value2)) {
+    if (mode === 6 && ((!value2 && value2 !== 0) || value1 >= value2)) {
       error = true;
     }
     this.state = {
-      mode, // 1 等于 2大于 3小于 4区间
+      mode, // 1 等于 2大于 3小于 4大于等于 5小于等于 6区间
       value1,
       value2,
       error
@@ -62,6 +70,8 @@ export default class NumberFieldFilter extends React.Component {
     this.handleMode2 = this.handleMode.bind(this, 2);
     this.handleMode3 = this.handleMode.bind(this, 3);
     this.handleMode4 = this.handleMode.bind(this, 4);
+    this.handleMode5 = this.handleMode.bind(this, 5);
+    this.handleMode6 = this.handleMode.bind(this, 6);
   }
 
   handleMode(mode) {
@@ -86,17 +96,21 @@ export default class NumberFieldFilter extends React.Component {
       this.setState({ error: true });
       return;
     }
-    if (mode === 4 && ((!value2 && value2 !== 0) || value1 >= value2)) {
+    if (mode === 6 && ((!value2 && value2 !== 0) || value1 >= value2)) {
       this.setState({ error: true });
       return;
     }
     this.setState({ error: false });
     let filter = value1;
     if (mode === 2) {
-      filter = { gte: value1 };
+      filter = { gt: value1 };
     } else if (mode === 3) {
-      filter = { lte: value1 };
+      filter = { gt: value1 };
     } else if (mode === 4) {
+      filter = { gte: value1 };
+    } else if (mode === 5) {
+      filter = { lte: value1 };
+    } else if (mode === 6) {
       filter = { gte: value1, lte: value2 };
     }
     this.props.onChange(filter);
@@ -109,7 +123,7 @@ export default class NumberFieldFilter extends React.Component {
     const buttonClassName = 'btn btn-default';
     const buttonClassNameActive = buttonClassName + ' btn-success';
     let input2 = null;
-    if (mode === 4) {
+    if (mode === 6) {
       input2 = <input
         type="number"
         className="form-control"
@@ -126,19 +140,22 @@ export default class NumberFieldFilter extends React.Component {
           <div className="form-group btn-group">
             <a
               className={mode === 1 ? buttonClassNameActive : buttonClassName}
-              onClick={this.handleMode1}>{t('equal')}
-            </a>
+              onClick={this.handleMode1}>=</a>
             <a
               className={mode === 2 ? buttonClassNameActive : buttonClassName}
-              onClick={this.handleMode2}>{t('greater')}
-            </a>
+              onClick={this.handleMode2}>&gt;</a>
             <a
               className={mode === 3 ? buttonClassNameActive : buttonClassName}
-              onClick={this.handleMode3}>{t('lesser')}
-            </a>
+              onClick={this.handleMode3}>&lt;</a>
             <a
               className={mode === 4 ? buttonClassNameActive : buttonClassName}
-              onClick={this.handleMode4}>{t('between')}
+              onClick={this.handleMode4}>&gt;=</a>
+            <a
+              className={mode === 5 ? buttonClassNameActive : buttonClassName}
+              onClick={this.handleMode5}>&lt;=</a>
+            <a
+              className={mode === 6 ? buttonClassNameActive : buttonClassName}
+              onClick={this.handleMode6}>{t('between')}
             </a>
           </div>
           <input

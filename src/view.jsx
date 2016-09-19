@@ -116,7 +116,7 @@ export default class NumberFieldView extends React.Component {
         onChange={this.handleChange}
         onFocus={this.handleFocus}
         onBlur={this.handleBlur}
-        value={this.state.display}
+        value={this.state.display || ''}
         disabled={disabled}
         placeholder={placeholder}
       />);
